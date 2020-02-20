@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <array name="timer_melody_name">
+        <item>Bibi</item>
+        <item>Song</item>
+        <item>Sound</item>
+    </array>
+
+    <array name="timer_melody_values">
+        <item>bibi</item>
+        <item>song</item>
+        <item>sound</item>
+    </array>
+</resources>
