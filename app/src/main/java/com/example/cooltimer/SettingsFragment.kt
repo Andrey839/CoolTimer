@@ -4,26 +4,29 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.core.util.rangeTo
 import androidx.preference.*
 
-class SettingsFragment(parcel: Parcel) : PreferenceFragmentCompat(),
+class SettingsFragment : PreferenceFragmentCompat(),
     SharedPreferences.OnSharedPreferenceChangeListener {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.timer_preference)
 
-        val preferenceFragment: SharedPreferences = this.preferenceScreen.sharedPreferences
-        val preferenceScreen = this.preferenceScreen
+        val preferenceFragment: SharedPreferences = preferenceScreen.sharedPreferences
+        val preferenceScreen = preferenceScreen
         val count = preferenceScreen.preferenceCount
 
-        for (i in count.rangeTo(Int.MAX_VALUE)) {
-            val preference: Preference = preferenceScreen.getPreference(i)
+        for (i in count.downTo(0)){
+            val preference: Preference = preferenceScreen.getPreference(1)
 
             if ((preference !is CheckBoxPreference)) {
                 val value = preferenceFragment.getString(preference.key, "")
 
                 setPreferenceLabel(preference, value)
             }
+
+
         }
     }
 
@@ -32,13 +35,15 @@ class SettingsFragment(parcel: Parcel) : PreferenceFragmentCompat(),
             val listPreference: ListPreference = preference
             val index = listPreference.findIndexOfValue(value)
             if (index >= 0) listPreference.summary = listPreference.entries[index]
+        } else if(preference is EditTextPreference) {
+            preference.summary = value
         }
 
     }
 
     companion object CREATOR : Parcelable.Creator<SettingsFragment> {
         override fun createFromParcel(parcel: Parcel): SettingsFragment {
-            return SettingsFragment(parcel)
+            return SettingsFragment()
         }
 
         override fun newArray(size: Int): Array<SettingsFragment?> {

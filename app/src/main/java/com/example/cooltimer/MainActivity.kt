@@ -10,19 +10,22 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlin.concurrent.timer
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener{
     lateinit var timer: CountDownTimer
+    var defaultInterval: Int = 0
+    lateinit var sharePref: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        sharePref = PreferenceManager.getDefaultSharedPreferences(this)
+
         seekBar.max = 600
+        setIntervalTimer(PreferenceManager.getDefaultSharedPreferences(this))
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 val minutes = progress / 60
@@ -37,6 +40,8 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        sharePref.registerOnSharedPreferenceChangeListener(this)
+
     }
 
     fun Timer(view: View) {
@@ -46,21 +51,20 @@ class MainActivity : AppCompatActivity() {
             timer = object : android.os.CountDownTimer((seekBar.progress * 1000).toLong(), 1000) {
                 override fun onFinish() {
 
-                    val preference: SharedPreferences =
-                        PreferenceManager.getDefaultSharedPreferences(this@MainActivity)
-                    if (preference.getBoolean("enable_sound", true)) {
-                        val melodyName = preference.getString("sound_value", "song")
+
+                    if (sharePref.getBoolean("enable_sound", true)) {
+                        val melodyName = sharePref.getString("sound_value", "song")
                         when(melodyName){
                             "song" ->   MediaPlayer.create(this@MainActivity, R.raw.song).start()
                             "bibi" ->   MediaPlayer.create(this@MainActivity, R.raw.bibi).start()
                             "sound" ->  MediaPlayer.create(this@MainActivity, R.raw.sound).start()
                         }
                         seekBar.isEnabled = true
-                        seekBar.progress = 0
+                        setIntervalTimer(sharePref)
                         button.text = "START"
                     }
                     seekBar.isEnabled = true
-                    seekBar.progress = 0
+                    setIntervalTimer(sharePref)
                     button.text = "START"
                 }
 
@@ -75,8 +79,7 @@ class MainActivity : AppCompatActivity() {
             timer.cancel()
             button.text = "START"
             seekBar.isEnabled = true
-            textView.text = "0:0"
-            seekBar.progress = 0
+            setIntervalTimer(sharePref)
         }
 
     }
@@ -97,5 +100,22 @@ class MainActivity : AppCompatActivity() {
             startActivity(about)
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    fun setIntervalTimer(sharedPreferences: SharedPreferences) {
+        defaultInterval = (sharedPreferences.getString("timer_default", "0"))!!.toInt()
+        textView.text = defaultInterval.toString()
+        seekBar.progress = defaultInterval
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        if (key.equals ("timer_default") ) {
+            setIntervalTimer(sharePref)
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        sharePref.unregisterOnSharedPreferenceChangeListener(this)
     }
 }

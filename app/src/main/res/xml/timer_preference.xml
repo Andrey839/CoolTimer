@@ -16,4 +16,9 @@
         android:entryValues="@array/timer_melody_values"
         />
 
+    <EditTextPreference
+        android:title="Timer Default Time"
+        android:key="timer_default"
+        android:defaultValue="0:0"/>
+
 </PreferenceScreen>
