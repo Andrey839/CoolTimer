@@ -4,11 +4,16 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
-import androidx.core.util.rangeTo
+import android.widget.Toast
 import androidx.preference.*
+import java.lang.Exception
+import java.lang.NumberFormatException
 
 class SettingsFragment : PreferenceFragmentCompat(),
-    SharedPreferences.OnSharedPreferenceChangeListener {
+    SharedPreferences.OnSharedPreferenceChangeListener{
+//    Preference
+//.OnPreferenceChangeListener {
+
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.timer_preference)
@@ -17,7 +22,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
         val preferenceScreen = preferenceScreen
         val count = preferenceScreen.preferenceCount
 
-        for (i in count.downTo(0)){
+        for (i in count.downTo(0)) {
             val preference: Preference = preferenceScreen.getPreference(1)
 
             if ((preference !is CheckBoxPreference)) {
@@ -28,6 +33,9 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
 
         }
+
+//        val preference: Preference? = findPreference("timer_default")
+//        preference?.onPreferenceChangeListener = this
     }
 
     fun setPreferenceLabel(preference: Preference, value: String?) {
@@ -35,7 +43,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
             val listPreference: ListPreference = preference
             val index = listPreference.findIndexOfValue(value)
             if (index >= 0) listPreference.summary = listPreference.entries[index]
-        } else if(preference is EditTextPreference) {
+        } else if (preference is EditTextPreference) {
             preference.summary = value
         }
 
@@ -71,4 +79,24 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
         preferenceScreen.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
     }
+
+//   override fun onPreferenceChange(preference: Preference?, newValue: Any?): Boolean {
+//
+//       val toast = Toast.makeText(context, "Не верное значение", Toast.LENGTH_LONG)
+//       if (preference?.key.equals("timer_default")) {
+//           newValue.toString()
+//           try {
+//
+//               newValue as Int
+//           }
+//
+//           catch (e: NumberFormatException){
+//               toast.show()
+//               return false
+//           }
+//       }
+//       return true
+//
+//   }
+//
 }

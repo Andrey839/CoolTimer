@@ -9,11 +9,13 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.SeekBar
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.activity_main.*
+import java.lang.Exception
 
-class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener{
+class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
     lateinit var timer: CountDownTimer
     var defaultInterval: Int = 0
     lateinit var sharePref: SharedPreferences
@@ -54,10 +56,10 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
                     if (sharePref.getBoolean("enable_sound", true)) {
                         val melodyName = sharePref.getString("sound_value", "song")
-                        when(melodyName){
-                            "song" ->   MediaPlayer.create(this@MainActivity, R.raw.song).start()
-                            "bibi" ->   MediaPlayer.create(this@MainActivity, R.raw.bibi).start()
-                            "sound" ->  MediaPlayer.create(this@MainActivity, R.raw.sound).start()
+                        when (melodyName) {
+                            "song" -> MediaPlayer.create(this@MainActivity, R.raw.song).start()
+                            "bibi" -> MediaPlayer.create(this@MainActivity, R.raw.bibi).start()
+                            "sound" -> MediaPlayer.create(this@MainActivity, R.raw.sound).start()
                         }
                         seekBar.isEnabled = true
                         setIntervalTimer(sharePref)
@@ -103,13 +105,18 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     }
 
     fun setIntervalTimer(sharedPreferences: SharedPreferences) {
-        defaultInterval = (sharedPreferences.getString("timer_default", "0"))!!.toInt()
+        try {
+            defaultInterval = (sharedPreferences.getString("timer_default", "0"))!!.toInt()
+        }
+        catch (e: Exception){
+            Toast.makeText(this, "Не правельное значение",Toast.LENGTH_LONG).show()
+        }
         textView.text = defaultInterval.toString()
         seekBar.progress = defaultInterval
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        if (key.equals ("timer_default") ) {
+        if (key.equals("timer_default")) {
             setIntervalTimer(sharePref)
         }
     }
